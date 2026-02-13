@@ -22,7 +22,6 @@ Write-Host "uv 版本: $(uv --version)" -ForegroundColor Green
 # 创建虚拟环境并安装依赖
 Write-Host "正在创建虚拟环境并安装依赖..." -ForegroundColor Yellow
 uv sync
-uv pip install -e .
 
 # 创建 output 目录
 if (-not (Test-Path "output")) {

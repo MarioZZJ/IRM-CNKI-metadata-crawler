@@ -21,7 +21,6 @@ echo "uv 版本: $(uv --version)"
 # 创建虚拟环境并安装依赖
 echo "正在创建虚拟环境并安装依赖..."
 uv sync
-uv pip install -e .
 
 # 创建 output 目录
 mkdir -p output
