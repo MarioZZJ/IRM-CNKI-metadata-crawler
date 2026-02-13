@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from http.cookiejar import Cookie
+
 import requests
 from bs4 import BeautifulSoup
 
@@ -21,6 +23,24 @@ class CnkiSession:
         })
         self.time_token: str = ""
         self.referer: str = ""
+
+    def load_cookies_from_string(self, cookie_str: str, domain: str) -> None:
+        """从浏览器导出的 cookie 字符串加载 cookie。"""
+        for item in cookie_str.split(";"):
+            item = item.strip()
+            if not item or "=" not in item:
+                continue
+            name, value = item.split("=", 1)
+            c = Cookie(
+                version=0, name=name.strip(), value=value.strip(),
+                port=None, port_specified=False,
+                domain=domain, domain_specified=True, domain_initial_dot=False,
+                path="/", path_specified=True,
+                secure=True, expires=None, discard=True,
+                comment=None, comment_url=None, rest={}, rfc2109=False,
+            )
+            self.session.cookies.set_cookie(c)
+        logger.info("已加载 %s 的浏览器 Cookie", domain)
 
     def _ajax_headers(self) -> dict[str, str]:
         return {

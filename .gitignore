@@ -4,6 +4,7 @@ __pycache__/
 output/
 paper_urls.json
 failed_items.json
+cookies.txt
 .env
 *.egg-info/
 dist/

@@ -128,6 +128,7 @@ def phase1_collect_urls(
 def phase2_crawl_details(
     urls_file: str = URLS_FILE,
     output_dir: str = "output",
+    cookies_file: str | None = None,
 ) -> None:
     """第二阶段：逐个访问论文详情页，解析元信息。"""
     papers = _load_urls_file(urls_file)
@@ -145,13 +146,19 @@ def phase2_crawl_details(
         return
 
     cnki = CnkiSession()
-    # 用任意一个期刊URL初始化会话（只需要cookie）
-    first_url = pending[0]["url"]
-    # 访问 kns.cnki.net 的文章页获取该域名的 cookie
-    try:
-        cnki.session.get("https://kns.cnki.net/", timeout=30)
-    except Exception:
-        pass
+
+    # 加载浏览器 Cookie（绕过验证码）
+    if cookies_file and os.path.exists(cookies_file):
+        with open(cookies_file, "r", encoding="utf-8") as f:
+            cookie_str = f.read().strip()
+        cnki.load_cookies_from_string(cookie_str, ".cnki.net")
+        cnki.load_cookies_from_string(cookie_str, "kns.cnki.net")
+    else:
+        # 没有 Cookie 文件时，先访问首页获取基础 cookie
+        try:
+            cnki.session.get("https://kns.cnki.net/", timeout=30)
+        except Exception:
+            pass
 
     captcha_count = 0
     success_count = 0
@@ -346,6 +353,10 @@ def main() -> None:
         help="仅执行阶段2: 爬取论文详情",
     )
     parser.add_argument(
+        "--cookies", type=str, default="cookies.txt",
+        help="浏览器 Cookie 文件路径 (默认: cookies.txt)",
+    )
+    parser.add_argument(
         "-v", "--verbose", action="store_true",
         help="显示详细日志",
     )
@@ -375,7 +386,10 @@ def main() -> None:
         phase1_collect_urls(journals, target_years)
 
     if run_phase2:
-        phase2_crawl_details(output_dir=args.output_dir)
+        phase2_crawl_details(
+            output_dir=args.output_dir,
+            cookies_file=args.cookies,
+        )
 
 
 if __name__ == "__main__":
