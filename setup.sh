@@ -19,8 +19,9 @@ fi
 echo "uv 版本: $(uv --version)"
 
 # 创建虚拟环境并安装依赖
+# 强制使用项目本地 .venv，避免 UV_PROJECT_ENVIRONMENT 指向 Conda 等外部环境导致冲突
 echo "正在创建虚拟环境并安装依赖..."
-uv sync
+UV_PROJECT_ENVIRONMENT=.venv uv sync
 
 # 创建 output 目录
 mkdir -p output
