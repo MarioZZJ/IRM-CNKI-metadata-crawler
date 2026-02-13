@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.venv/
+output/
+paper_urls.json
+failed_items.json
+.env
+*.egg-info/
+dist/
+build/
+.mypy_cache/
