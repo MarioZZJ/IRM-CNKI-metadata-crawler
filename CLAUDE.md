@@ -49,23 +49,37 @@ src/cnki_crawler/
 ### 关键策略
 - **请求间隔**: 3-5 秒随机延迟
 - **验证码处理**: 检测302重定向到/verify/页面，连续3次后暂停，提示用户手动处理
+- **Cookie 导入**: 支持从浏览器导出 Cookie 注入到 requests Session，绕过验证码
 - **断点续爬**: paper_urls.json 中的 detail_crawled 字段标记每篇论文的爬取状态
 - **进度显示**: 实时显示当前进度
+
+### 反爬与验证码说明
+- **navi.cnki.net**（阶段1）：反爬宽松，Python requests 直接访问即可，无需特殊处理
+- **kns.cnki.net**（阶段2）：反爬严格，Python requests 裸请求会立即触发点选文字验证码（clickWord），即使同一 IP 在浏览器中可以正常访问
+- **根本原因**：CNKI 同时检查 IP 和 Cookie/会话状态。浏览器有完整的 Cookie 和 JS 执行环境，而 requests 是裸 HTTP 客户端，缺少关键 Cookie（如 `cnkiUserKey`、`SID_kns_new` 等），因此被识别为爬虫
+- **解决方案**：从浏览器导出 Cookie 保存到 `cookies.txt`，爬虫通过 `--cookies` 参数加载后即可正常访问
+- **Cookie 时效**：Cookie 有有效期，过期后需重新从浏览器获取
 
 ## 命令行用法
 ```bash
 # 阶段1: 收集论文 URL 列表
 uv run python -m cnki_crawler --phase1 --year 2024
 
-# 阶段2: 爬取论文详情（可多次运行直到完成）
-uv run python -m cnki_crawler --phase2
+# 阶段2: 爬取论文详情（需要 cookies.txt）
+uv run python -m cnki_crawler --phase2 --cookies cookies.txt
 
 # 仅爬取指定期刊
 uv run python -m cnki_crawler --phase1 --year 2024 --journal "中国图书馆学报"
 
 # 一次性执行两个阶段（默认模式）
-uv run python -m cnki_crawler --year 2024
+uv run python -m cnki_crawler --year 2024 --cookies cookies.txt
 ```
+
+### Cookie 获取方法
+1. 在 Chrome 浏览器中访问任意一篇 CNKI 论文详情页（如有验证码则手动通过）
+2. 打开开发者工具（F12）→ Console，执行 `document.cookie`
+3. 将输出的 cookie 字符串保存到项目根目录的 `cookies.txt` 文件中
+4. 运行阶段2时通过 `--cookies cookies.txt` 加载
 
 ## 输出格式
 
@@ -90,4 +104,4 @@ uv run python -m cnki_crawler --year 2024
 - [x] 编码实现
 - [x] 阶段1 测试通过（URL收集正常）
 - [x] 阶段2 验证码检测正常
-- [ ] 阶段2 实际爬取测试（需手动通过验证码后测试）
+- [x] 阶段2 浏览器Cookie导入方案验证通过（53篇论文全部成功解析）
