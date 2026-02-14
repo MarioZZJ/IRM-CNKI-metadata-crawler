@@ -1,12 +1,12 @@
 [project]
 name = "cnki-metadata-crawler"
-version = "0.1.0"
+version = "0.3.0"
 description = "CNKI 期刊论文元信息爬虫"
 requires-python = ">=3.11"
 dependencies = [
     "beautifulsoup4>=4.14.3",
+    "DrissionPage>=4.1.1.2",
     "lxml>=6.0.2",
-    "requests>=2.32.5",
 ]
 
 [build-system]

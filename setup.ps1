@@ -28,18 +28,8 @@ if (-not (Test-Path "output")) {
     New-Item -ItemType Directory -Path "output" | Out-Null
 }
 
-# 检查 cookies.txt
-if (-not (Test-Path "cookies.txt")) {
-    Write-Host ""
-    Write-Host "[提示] 未找到 cookies.txt，阶段2需要浏览器 Cookie 才能运行。" -ForegroundColor Yellow
-    Write-Host "获取方法:" -ForegroundColor Yellow
-    Write-Host "  1. 在 Chrome 中访问 https://kns.cnki.net 的任意论文详情页" -ForegroundColor White
-    Write-Host "  2. F12 打开开发者工具 -> Console -> 输入 document.cookie" -ForegroundColor White
-    Write-Host "  3. 将输出内容保存到项目根目录的 cookies.txt 文件中" -ForegroundColor White
-}
-
 Write-Host ""
 Write-Host "=== 初始化完成 ===" -ForegroundColor Cyan
 Write-Host "运行示例:" -ForegroundColor Green
-Write-Host "  uv run python -m cnki_crawler --phase1 --year 2024" -ForegroundColor White
-Write-Host "  uv run python -m cnki_crawler --phase2 --cookies cookies.txt" -ForegroundColor White
+Write-Host "  uv run python -m cnki_crawler --year 2025" -ForegroundColor White
+Write-Host "  uv run python -m cnki_crawler --year 2025 --port 9222" -ForegroundColor White
